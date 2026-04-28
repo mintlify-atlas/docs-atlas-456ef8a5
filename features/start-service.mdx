@@ -1,0 +1,72 @@
+---
+title: 'Starting new electricity service at an address'
+description: 'Walk through the multi-step wizard to request electricity service at a new address, choose a plan, and schedule your start date.'
+---
+
+The Start New Service wizard lets you request electricity service at a new property address. The wizard is publicly accessible — you do not need to be logged in to begin. If you are not logged in, the wizard includes an extra step to collect your personal information before submission.
+
+<Note>
+  Each step validates your input before you can proceed. Required fields are marked in the form. You cannot advance to the next step until all required fields on the current step are complete.
+</Note>
+
+## Wizard steps
+
+<Steps>
+  <Step title="Property address">
+    Enter the address where you need service. As you type, the address field uses autocomplete (powered by photon.komoot.io) to suggest matching addresses.
+
+    Complete all address fields:
+
+    | Field | Description |
+    | ----- | ----------- |
+    | **Street** | Street number and name |
+    | **City** | City name |
+    | **State** | State abbreviation |
+    | **ZIP** | Postal code |
+  </Step>
+
+  <Step title="Schedule & plan">
+    Configure your service start details and choose the plan that fits your household.
+
+    **Start date** — Select the date you want service to begin.
+
+    **Plan type** — Choose one of the following:
+
+    | Plan | Description |
+    | ---- | ----------- |
+    | Standard Residential (Fixed Rate) | Predictable monthly rate; ideal for most households |
+    | 100% Renewable Energy (Variable) | Powered entirely by renewable sources; rate varies with market conditions |
+    | Time-of-Use Savings Plan | Lower rates during off-peak hours; best if you can shift usage to evenings or weekends |
+
+    **Property type** — Select the type of property:
+    - Single Family Home
+    - Apartment
+    - Gated Community
+
+    **Access logistics** — Provide details to help the crew access your property on the service start date:
+
+    - **Is someone present?** — Select **Yes** if someone will be on-site. Select **No** to provide access instructions.
+    - **Access instructions** — Required if no one will be present. Describe how the crew can access the meter (for example, gate code or key location).
+    - **Secondary contact** — Optional. A phone number or name the crew can reach if needed.
+  </Step>
+
+  <Step title="Personal information (new users only)">
+    This step appears only if you are not logged in. Provide your personal details so the utility can create or link your account.
+
+    | Field | Description |
+    | ----- | ----------- |
+    | **First name** | Your legal first name |
+    | **Last name** | Your legal last name |
+    | **Email** | Contact email address |
+    | **Phone** | Primary phone number |
+    | **SSN / ID** | Social Security Number or government-issued ID |
+  </Step>
+
+  <Step title="Review & submit">
+    Review all information you have entered across the previous steps. If anything needs correction, use the **Back** button to return to the relevant step.
+
+    When everything looks correct, click **Submit**. The portal sends your request to `POST /utility/electricity/start-service` with your full form data.
+
+    On success, the page displays your **confirmation number** (ticket ID). Save this number — you can use it to check the status of your service request with support.
+  </Step>
+</Steps>

@@ -1,0 +1,40 @@
+---
+title: 'Submit meter readings and service requests'
+description: 'Submit electricity meter readings, open service request tickets, and register a new address — all from the Services page in Smart CX.'
+---
+
+The Services page gives you two self-service actions for your electricity account: submitting a meter reading and creating a service request ticket. You can also start the process of adding a new address from here.
+
+## Submit a meter reading
+
+Use this form to report your current electricity consumption. Submitting regular readings helps ensure accurate billing when your meter is not read automatically.
+
+<Tip>
+  Submit a meter reading at the end of each billing cycle, or any time your utility provider requests a self-reported reading.
+</Tip>
+
+<Steps>
+  <Step title="Open the Services page">
+    Navigate to **Services** in the main menu.
+  </Step>
+  <Step title="Enter your current reading">
+    In the **Submit Meter Reading** section, type your current meter value in the **Current Reading (kWh)** field. The field accepts numbers only and is required.
+  </Step>
+  <Step title="Submit the reading">
+    Click **Submit Reading**. The portal sends your reading to `POST /utility/electricity/meter-reading`.
+
+    On success, a confirmation message appears and clears automatically after 3 seconds. If the submission fails, an error message is displayed instead.
+  </Step>
+</Steps>
+
+## Create a service request
+
+If you have an issue with your electricity service that is not an outage — such as billing discrepancies, equipment concerns, or installation questions — use the service request form to open a support ticket.
+
+1. In the **New Service Request** section, enter a description of your issue in the **Issue Description** field.
+2. Click **Submit Request**. The portal sends your description to `POST /utility/electricity/service-request`.
+3. On success, the page displays: **"Request created! Ticket ID: \<ticketId\>"**. Keep this ticket ID for reference when following up with support.
+
+## Register a new address
+
+If you need to start electricity service at a new address, click the **Register New Address** card on the Services page. This takes you to the [Start New Service](/features/start-service) wizard where you can complete the full setup.

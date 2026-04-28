@@ -1,0 +1,92 @@
+---
+title: "GET /utility/payment/history — Retrieve payment history"
+description: "Returns the full transaction history for the authenticated account, including status, amount, method, and date for each payment attempt."
+---
+
+The `/utility/payment/history` endpoint retrieves a list of all past payment transactions for the current account. Each entry in the response corresponds to a single payment attempt and includes its outcome, making it useful for displaying billing history and investigating failed charges.
+
+## Request
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication. Format: `Bearer <token>`
+</ParamField>
+
+## Response
+
+<ResponseField name="payments" type="object[]" required>
+  Array of payment transaction records, ordered most recent first.
+
+  <Expandable title="payment object properties">
+    <ResponseField name="transactionId" type="string" required>
+      Unique identifier for the transaction. Example: `TXN-839182`
+    </ResponseField>
+
+    <ResponseField name="date" type="string" required>
+      ISO 8601 timestamp of when the transaction was recorded. Example: `2025-11-15T00:00:00.000Z`
+    </ResponseField>
+
+    <ResponseField name="method" type="string" required>
+      Payment method used for this transaction. One of `credit_card`, `bank_transfer`, or `debit_card`.
+    </ResponseField>
+
+    <ResponseField name="amount" type="number" required>
+      Transaction amount in USD.
+    </ResponseField>
+
+    <ResponseField name="status" type="string" required>
+      Outcome of the transaction. One of:
+      - `success` — Payment was processed and confirmed.
+      - `pending` — Payment is still being processed.
+      - `failed` — Payment was declined or encountered an error.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error codes
+
+| Status | Description |
+|--------|-------------|
+| `401 Unauthorized` | Missing or invalid `Authorization` header. |
+| `500 Internal Server Error` | Unexpected server-side failure. |
+
+## Example
+
+<CodeGroup>
+
+```bash Request
+curl --request GET \
+  --url https://YOUR_ID.mockapi.dog/utility/payment/history \
+  --header 'Authorization: Bearer <token>'
+```
+
+```json Response
+{
+  "payments": [
+    {
+      "transactionId": "TXN-839182",
+      "date": "2025-11-15T00:00:00.000Z",
+      "method": "credit_card",
+      "amount": 126.45,
+      "status": "success"
+    },
+    {
+      "transactionId": "TXN-812045",
+      "date": "2025-10-14T00:00:00.000Z",
+      "method": "bank_transfer",
+      "amount": 114.20,
+      "status": "failed"
+    },
+    {
+      "transactionId": "TXN-799301",
+      "date": "2025-09-15T00:00:00.000Z",
+      "method": "debit_card",
+      "amount": 118.90,
+      "status": "pending"
+    }
+  ]
+}
+```
+
+</CodeGroup>

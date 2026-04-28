@@ -1,0 +1,111 @@
+---
+title: 'Token expiry and automatic refresh'
+description: 'The Smart CX portal automatically renews expired JWT access tokens using POST /auth/refresh, retrying the original request without interrupting the user.'
+---
+
+JWT access tokens are short-lived by design. When an access token expires, the portal automatically exchanges the refresh token for a new one and retries the failed request — without any interruption to your workflow.
+
+## How automatic refresh works
+
+When any API request returns a `401 Unauthorized` response, the portal's response interceptor takes over:
+
+<Steps>
+  <Step title="Detect expiry">
+    The interceptor catches the `401` response. If the failed request was not already a retry, it proceeds with the refresh flow.
+  </Step>
+  <Step title="Call /auth/refresh">
+    The interceptor sends the stored `refreshToken` to `POST /auth/refresh` to obtain a new access token.
+  </Step>
+  <Step title="Update stored tokens">
+    The new access token (and optionally a new refresh token) is stored via the `updateTokens` action in the `auth` Redux slice.
+  </Step>
+  <Step title="Retry the original request">
+    The original request is retried automatically with the new `Authorization: Bearer` header.
+  </Step>
+  <Step title="Logout on failure">
+    If the refresh request itself fails, the `logout` action is dispatched, clearing all stored credentials. You are redirected to the login page.
+  </Step>
+</Steps>
+
+<Note>
+  The interceptor marks each request with `_retry = true` before attempting a refresh. This prevents infinite retry loops if the refresh token is also rejected.
+</Note>
+
+## Endpoint
+
+```
+POST /auth/refresh
+```
+
+### Request body
+
+<ParamField body="refreshToken" type="string" required>
+  The refresh token previously issued by `POST /auth/login` or a prior refresh response.
+</ParamField>
+
+### Response fields
+
+<ResponseField name="accessToken" type="string" required>
+  The new short-lived JWT access token. Use this in the `Authorization: Bearer` header for subsequent requests.
+</ResponseField>
+
+<ResponseField name="refreshToken" type="string">
+  A new refresh token, if the server rotates refresh tokens. If absent, the existing refresh token remains valid.
+</ResponseField>
+
+## Example
+
+```bash
+curl --request POST \
+  --url https://api.smartcx.example.com/auth/refresh \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "refreshToken": "<your_refresh_token>"
+  }'
+```
+
+Example response:
+
+```json
+{
+  "accessToken": "<new_access_token>",
+  "refreshToken": "<new_refresh_token>"
+}
+```
+
+## What happens when refresh fails
+
+If `POST /auth/refresh` returns an error — for example because the refresh token has expired or been revoked — the portal:
+
+1. Dispatches the `logout` action, which clears `user`, `token`, and `refreshToken` from the `auth` slice.
+2. Redirects you to the login page.
+
+<Warning>
+  The refresh flow is not retried. A failed refresh results in immediate logout. If this happens unexpectedly, log in again to obtain a new token pair.
+</Warning>
+
+## Manually refreshing a token
+
+If you are calling the API directly (outside the portal), handle token refresh in your own client logic:
+
+```bash
+curl --request POST \
+  --url https://api.smartcx.example.com/auth/refresh \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "refreshToken": "<your_refresh_token>"
+  }'
+```
+
+Store the returned `accessToken` and use it for subsequent requests. If you receive a `401` on the refresh call itself, prompt the user to log in again.
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Authentication overview" icon="shield" href="/authentication/overview">
+    Understand the full JWT authentication model.
+  </Card>
+  <Card title="Login" icon="arrow-right-to-bracket" href="/authentication/login">
+    Obtain your initial access and refresh tokens.
+  </Card>
+</CardGroup>

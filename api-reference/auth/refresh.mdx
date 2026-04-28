@@ -1,0 +1,58 @@
+---
+title: "POST /auth/refresh — Renew an expired access token"
+description: "Exchanges a valid refresh token for a new JWT access token, extending the user session without requiring the user to re-authenticate."
+---
+
+Use a stored refresh token to obtain a new JWT access token after the current one expires. The response always includes a new `accessToken` (which may also be returned as `token`). If token rotation is enabled, a new `refreshToken` is also returned; replace the stored value in that case.
+
+<Note>
+  The Smart CX Utility Portal handles token refresh automatically. When any request returns a `401`, the portal retries it after calling this endpoint. Manual calls to this endpoint are only needed for custom API integrations that manage their own auth flow.
+</Note>
+
+## Request body
+
+<ParamField body="refreshToken" type="string" required>
+  The refresh token obtained from a previous login or refresh response.
+</ParamField>
+
+## Response fields
+
+<ResponseField name="accessToken" type="string">
+  New JWT access token. This field may alternatively be named `token` in the response. Use it in the `Authorization: Bearer` header on subsequent requests.
+</ResponseField>
+
+<ResponseField name="refreshToken" type="string">
+  New refresh token. Only present if token rotation is enabled. If returned, replace the previously stored refresh token with this value.
+</ResponseField>
+
+## Error responses
+
+| Status | Description |
+|--------|-------------|
+| `401`  | The refresh token is invalid or has expired. The user session is terminated and the user must log in again. |
+
+<Warning>
+  If this endpoint returns `401`, the user session is immediately terminated. The portal clears all stored tokens and redirects the user to the login page. Any unsaved work will be lost.
+</Warning>
+
+## Example
+
+<CodeGroup>
+
+```bash Request
+curl --request POST \
+  --url https://YOUR_ID.mockapi.dog/auth/refresh \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "refreshToken": "jwt_refresh_token_mock"
+  }'
+```
+
+```json Response
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+</CodeGroup>

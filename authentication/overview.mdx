@@ -1,0 +1,69 @@
+---
+title: 'Authenticate with the Smart CX API'
+description: 'Smart CX uses JWT-based authentication. Learn how access tokens are obtained, attached to requests, automatically refreshed, and revoked on logout.'
+---
+
+The Smart CX API uses **JSON Web Tokens (JWT)** for authentication. Every request to a protected endpoint must include a valid access token. The portal manages token lifecycle automatically — acquiring, attaching, and refreshing tokens without requiring any action from you.
+
+## How it works
+
+<Steps>
+  <Step title="Log in">
+    You authenticate via the login page. On success, the portal receives an access token and a refresh token, both stored in the application state.
+  </Step>
+  <Step title="Make authenticated requests">
+    Every API request automatically includes your access token in the `Authorization` header as a Bearer token.
+  </Step>
+  <Step title="Token refresh">
+    When a request returns a `401 Unauthorized` response, the portal automatically attempts to exchange your refresh token for a new access token and retries the original request.
+  </Step>
+  <Step title="Logout on failure">
+    If the token refresh fails (for example, because the refresh token has expired), you are logged out and redirected to the login page.
+  </Step>
+</Steps>
+
+## Sending the access token
+
+Include your access token in the `Authorization` header of every request:
+
+```bash
+curl --request GET \
+  --url https://api.smartcx.example.com/v1/resource \
+  --header 'Authorization: Bearer <your_access_token>'
+```
+
+<Note>
+  The portal attaches this header automatically for all requests made through the built-in API client. You only need to set it manually if you are calling the API directly from an external tool or script.
+</Note>
+
+## Token storage
+
+The portal stores both the access token and the refresh token in the application's Redux store under the `auth` slice:
+
+| Field          | Description                                             |
+| -------------- | ------------------------------------------------------- |
+| `token`        | Short-lived JWT used to authorize API requests.         |
+| `refreshToken` | Long-lived token used to obtain a new access token.     |
+| `user`         | Authenticated user object returned on login.            |
+
+## Error responses
+
+| Status | Meaning                                                                                         |
+| ------ | ----------------------------------------------------------------------------------------------- |
+| `401`  | Access token is missing, expired, or invalid. The portal automatically attempts a token refresh. |
+| `403`  | The token is valid but the user lacks permission for the requested resource.                    |
+
+<Warning>
+  If the `/auth/refresh` endpoint itself returns a `401`, the portal will not retry. The user is immediately logged out to prevent an infinite refresh loop.
+</Warning>
+
+## Related pages
+
+<CardGroup cols={2}>
+  <Card title="Login" icon="arrow-right-to-bracket" href="/authentication/login">
+    Authenticate and obtain your initial access and refresh tokens.
+  </Card>
+  <Card title="Token refresh" icon="rotate" href="/authentication/token-refresh">
+    Understand how token expiry and automatic refresh work.
+  </Card>
+</CardGroup>

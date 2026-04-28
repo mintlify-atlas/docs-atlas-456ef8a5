@@ -1,0 +1,102 @@
+---
+title: "POST /utility/electricity/meter-reading"
+description: "Submit a new electricity meter reading for the authenticated account. Accepts either the 'reading' or 'currentReading' field name in the request body."
+---
+
+Use this endpoint to record a customer-submitted meter reading. The portal's Services component sends the field as `reading`, while the Postman collection uses `currentReading`. Both field names are accepted — include whichever is appropriate for your integration. Providing `accountId` in the body is recommended when calling the endpoint from a server context where the account cannot be inferred from the bearer token alone.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for the authenticated session. Format: `Bearer <token>`
+</ParamField>
+
+**Method:** `POST`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/meter-reading`
+
+**Content-Type:** `application/json`
+
+### Body parameters
+
+<ParamField body="reading" type="number">
+  Current meter reading value in kWh. Used by the portal's Services component. Provide either `reading` or `currentReading` — not both.
+
+  Example: `14562`
+</ParamField>
+
+<ParamField body="currentReading" type="number">
+  Current meter reading value in kWh. Used in the Postman collection. Provide either `currentReading` or `reading` — not both.
+
+  Example: `14562`
+</ParamField>
+
+<ParamField body="accountId" type="string">
+  Electricity account identifier. Recommended when calling from a server-side context.
+
+  Example: `"ELEC-100234"`
+</ParamField>
+
+<Note>
+  The `reading` and `currentReading` fields are functionally equivalent. The API accepts either name. Choose the field name that matches your existing integration or tooling.
+</Note>
+
+## Response
+
+A successful submission returns HTTP `200` or `201` with a confirmation object.
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the reading was recorded.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Human-readable confirmation message.
+</ResponseField>
+
+## Error codes
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Request body is missing both `reading` and `currentReading`, or the value is not a valid number. |
+| `401` | Missing or invalid `Authorization` header. |
+| `403` | Token does not have permission to submit readings for this account. |
+| `404` | No electricity account found for the provided `accountId`. |
+| `500` | Internal server error. |
+
+## Examples
+
+<CodeGroup>
+
+```bash Portal format (reading)
+curl --request POST \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/meter-reading" \
+  --header "Authorization: Bearer <token>" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "reading": 14562
+  }'
+```
+
+```bash Postman format (currentReading)
+curl --request POST \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/meter-reading" \
+  --header "Authorization: Bearer <token>" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "accountId": "ELEC-100234",
+    "currentReading": 14562
+  }'
+```
+
+</CodeGroup>
+
+<ResponseExample>
+
+```json 200
+{
+  "success": true,
+  "message": "Meter reading submitted successfully."
+}
+```
+
+</ResponseExample>

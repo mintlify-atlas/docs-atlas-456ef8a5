@@ -1,0 +1,37 @@
+---
+title: 'Outage monitoring and reporting in your area'
+description: 'Check real-time outage status for your service area, view estimated restoration times, and report a new outage directly from the portal.'
+---
+
+The Outages page shows the current status of the electrical grid in your service area and lets you report a new outage. Status data is fetched automatically when you open the page and refreshes every 5 minutes.
+
+## Outage status banner
+
+At the top of the page, a status banner tells you at a glance whether there is an active outage.
+
+| State | Appearance | Details shown |
+| ----- | ---------- | ------------- |
+| No outage | Green — **Grid Status: Normal** | Status message and last updated time |
+| Active outage | Red — **Active Outage Reported** | Status message and estimated restoration time |
+
+When an outage is active, the banner displays the **Estimated Restoration** time so you know when service is expected to return.
+
+## Service area card
+
+Below the banner, the Service Area card shows details about your account and any impact in your area:
+
+- **Current service address** — The address associated with your account.
+- **Affected customers** — The number of customers currently impacted by the outage.
+- **Crew status** — The current activity of the field crew (for example, "Standby" or "En Route").
+
+## Report an outage
+
+If you are experiencing an outage that is not yet reflected in the status banner, use the report form to notify the utility.
+
+<Warning>
+  If this is an emergency or you see downed power lines, call **911** immediately. Do not wait to submit a portal report.
+</Warning>
+
+1. In the **Report Outage** section, optionally add any relevant details in the **Additional Details** field (for example, when the outage started or any unusual circumstances you observed).
+2. Click **Report Outage**. The portal submits your report to `POST /utility/electricity/outages/report` with your account ID, the details you entered, and the current timestamp.
+3. After a successful submission, a confirmation message appears. The portal automatically refreshes the outage status 2 seconds later, so the banner reflects any updates triggered by your report.

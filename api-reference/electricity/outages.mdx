@@ -1,0 +1,170 @@
+---
+title: "Electricity outage status and reporting endpoints"
+description: "Check current outage status for the authenticated account's service area, and submit a new outage report with account ID, details, and a timestamp."
+---
+
+Two endpoints support outage workflows: one to retrieve the current outage status for the customer's area, and one to file an outage report. Poll the status endpoint to determine whether an outage is active before prompting the customer to submit a report.
+
+---
+
+## GET /utility/electricity/outages/status
+
+Returns the current outage status for the service area associated with the authenticated account.
+
+### Request
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for the authenticated session. Format: `Bearer <token>`
+</ParamField>
+
+**Method:** `GET`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/outages/status`
+
+No query parameters or request body are required.
+
+### Response
+
+<ResponseField name="activeOutage" type="boolean" required>
+  Whether an outage is currently active in the customer's service area.
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Human-readable status summary. Example: `"No known outages in your area."`
+</ResponseField>
+
+<ResponseField name="lastUpdated" type="string" required>
+  ISO 8601 timestamp of the most recent status update.
+</ResponseField>
+
+<ResponseField name="estimatedRestoration" type="string">
+  ISO 8601 timestamp for the estimated restoration time. Present only when `activeOutage` is `true`.
+</ResponseField>
+
+<ResponseField name="affectedCustomers" type="number" required>
+  Number of customers currently affected by the outage. Returns `0` when there is no active outage.
+</ResponseField>
+
+<ResponseField name="crewStatus" type="string" required>
+  Current crew deployment status. Example values: `"Standby"`, `"En Route"`, `"On Site"`
+</ResponseField>
+
+### Example
+
+```bash
+curl --request GET \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/outages/status" \
+  --header "Authorization: Bearer <token>"
+```
+
+<ResponseExample>
+
+```json 200 – no active outage
+{
+  "activeOutage": false,
+  "message": "No known outages in your area.",
+  "lastUpdated": "2025-11-20T14:00:00.000Z",
+  "affectedCustomers": 0,
+  "crewStatus": "Standby"
+}
+```
+
+```json 200 – active outage
+{
+  "activeOutage": true,
+  "message": "An outage has been detected in your area.",
+  "lastUpdated": "2025-11-20T16:30:00.000Z",
+  "estimatedRestoration": "2025-11-20T20:00:00.000Z",
+  "affectedCustomers": 342,
+  "crewStatus": "On Site"
+}
+```
+
+</ResponseExample>
+
+---
+
+## POST /utility/electricity/outages/report
+
+Submits an outage report on behalf of the authenticated customer.
+
+### Request
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for the authenticated session. Format: `Bearer <token>`
+</ParamField>
+
+**Method:** `POST`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/outages/report`
+
+**Content-Type:** `application/json`
+
+#### Body parameters
+
+<ParamField body="accountId" type="string" required>
+  Electricity account identifier for the reporting customer.
+
+  Example: `"ELEC-100234"`
+</ParamField>
+
+<ParamField body="details" type="string">
+  Optional free-text description of the outage or observed event.
+
+  Example: `"Heard a loud pop and all lights went out."`
+</ParamField>
+
+<ParamField body="reportedAt" type="string" required>
+  ISO 8601 timestamp indicating when the customer observed the outage.
+
+  Example: `"2025-11-20T16:28:00.000Z"`
+</ParamField>
+
+### Response
+
+<ResponseField name="success" type="boolean">
+  Indicates whether the report was accepted.
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Confirmation or error message.
+</ResponseField>
+
+### Example
+
+```bash
+curl --request POST \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/outages/report" \
+  --header "Authorization: Bearer <token>" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "accountId": "ELEC-100234",
+    "details": "Heard a loud pop and all lights went out.",
+    "reportedAt": "2025-11-20T16:28:00.000Z"
+  }'
+```
+
+<ResponseExample>
+
+```json 200
+{
+  "success": true,
+  "message": "Your outage report has been received."
+}
+```
+
+</ResponseExample>
+
+---
+
+## Error codes
+
+The following error codes apply to both endpoints.
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Missing required body fields (POST only). |
+| `401` | Missing or invalid `Authorization` header. |
+| `403` | Token does not have permission to access outage data for this account. |
+| `404` | No electricity account found for the provided `accountId`. |
+| `500` | Internal server error. |

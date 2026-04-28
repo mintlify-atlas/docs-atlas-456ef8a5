@@ -1,81 +1,85 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
-icon: 'rocket'
+title: "Get started with Smart CX"
+description: "Log in to your utility portal, explore the account dashboard, and complete your first action — paying a bill or submitting a meter reading — in minutes."
 ---
 
-## Get started in three steps
-
-Get your documentation site running locally and make your first customization.
-
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
-
-## Next steps
-
-Now that you have your docs running, explore these key features:
-
-<CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
-</CardGroup>
+Smart CX is your all-in-one utility account portal. Whether you need to check your current balance, pay an outstanding bill, or report a power outage, every action is a few clicks away. This guide walks you through logging in for the first time, orienting yourself on the dashboard, and completing a core task so you can get on with your day.
 
 <Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
+  You can start service at a new address without logging in. Visit the **Start Service** page from the portal's home screen and follow the guided wizard — no account required.
 </Note>
+
+## Before you begin
+
+You need two things before you log in:
+
+- **A Smart CX account.** Your utility provider creates this when you sign up for service. Contact your provider if you have not received your account credentials.
+- **Your portal URL.** This is the web address your utility provider gave you (for example, `https://portal.yourprovider.com`). Bookmark it for easy access.
+
+## Get up and running
+
+<Steps>
+  <Step title="Log in for the first time">
+    Open your portal URL in a browser. You will be redirected to the secure login screen.
+
+    Enter the **email address** and **password** associated with your Smart CX account, then click **Sign in**.
+
+    Smart CX authenticates you using a secure JWT session. Once verified, you are taken directly to your dashboard.
+
+    <Note>
+      Your session persists across page refreshes. After 5 minutes of inactivity, a session timeout warning appears with a 60-second countdown. Click **Keep Session Alive** to continue, or **Sign Out** to end the session immediately.
+    </Note>
+  </Step>
+
+  <Step title="Navigate the dashboard">
+    The dashboard gives you an at-a-glance summary of your account:
+
+    - **Current balance** — the amount owed on your latest bill
+    - **Due date** — when payment is expected
+    - **Plan** — your active service plan
+    - **Meter number** — the identifier for your meter
+    - **Service address** — the property associated with your account
+
+    Use the navigation menu to move between sections: **Bills**, **Services**, **Outages**, **Payment**, and **Profile**.
+  </Step>
+
+  <Step title="Pay your first bill">
+    1. Select **Bills** from the navigation menu to view your billing history.
+    2. Locate an outstanding bill and click **Pay now**.
+    3. You will be taken to the secure **Payment** page, which loads a payment form in an isolated iframe.
+    4. Enter your payment details and confirm. Your payment is recorded and your balance updates immediately.
+
+    <Tip>
+      Once a payment is processed, you can return to **Bills** to download a record of the transaction.
+    </Tip>
+  </Step>
+
+  <Step title="Submit a meter reading">
+    If your account requires manual meter submissions, navigate to **Services** from the main menu.
+
+    1. Click **Submit meter reading**.
+    2. Enter the current reading from your physical meter.
+    3. Click **Submit**. The reading is sent to your utility provider and logged under your service history.
+
+    <Tip>
+      You can also open a service request from this page if you need to report an issue with your meter or connection.
+    </Tip>
+  </Step>
+</Steps>
+
+## What to explore next
+
+<CardGroup cols={2}>
+  <Card title="Bills & payment history" icon="file-invoice" href="/features/bills">
+    Browse, filter, and export your full billing history.
+  </Card>
+  <Card title="Outage center" icon="bolt" href="/features/outages">
+    Check real-time outage status for your area and report a power loss.
+  </Card>
+  <Card title="Profile management" icon="user" href="/features/profile">
+    Update your personal details and manage service addresses.
+  </Card>
+  <Card title="Start new service" icon="house-circle-check" href="/features/start-service">
+    Activate electricity at a new address without logging in.
+  </Card>
+</CardGroup>

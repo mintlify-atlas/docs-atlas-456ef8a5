@@ -1,23 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": "Smart CX Utility Portal",
+  "projectType": "saas",
+  "projectName": "Smart CX Utility Portal",
+  "projectDescription": "A full-stack customer experience portal for utility companies that lets end-users manage electricity accounts, view and pay bills, report outages, submit meter readings, and get AI-powered support.",
   "theme": "luma",
-  "colors": {
-    "primary": "#1A6FDB",
-    "light": "#E8F1FD",
-    "dark": "#0D3E80"
-  },
-  "navbar": {
-    "primary": {
-      "type": "github",
-      "href": "https://github.com/mittal-SEW/utility-api-project"
-    }
-  },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/mittal-SEW/utility-api-project"
-    }
-  },
+  "primaryColor": "#1A6FDB",
+  "lightColor": "#E8F1FD",
+  "darkColor": "#0D3E80",
   "navigation": {
     "tabs": [
       {
@@ -112,5 +100,33 @@
         ]
       }
     ]
-  }
+  },
+  "keyFeatures": [
+    "JWT authentication with automatic token refresh and session persistence via Redux Persist",
+    "Account dashboard showing current balance, due date, meter info, and service addresses",
+    "Bill history with date range filtering and CSV export",
+    "Multi-method payment processing through a secure iframe micro-frontend",
+    "Real-time outage status monitoring with outage reporting form",
+    "Meter reading submission and service request ticketing",
+    "Multi-step new service activation wizard with address autocomplete",
+    "AI-powered support chat widget with support ticket management",
+    "Micro-frontend architecture using Vite Module Federation"
+  ],
+  "publicApiSurface": [
+    "POST /auth/login",
+    "POST /auth/refresh",
+    "GET /utility/electricity/account",
+    "GET /utility/electricity/bills",
+    "POST /utility/electricity/meter-reading",
+    "POST /utility/electricity/service-request",
+    "POST /utility/electricity/start-service",
+    "GET /utility/electricity/outages/status",
+    "POST /utility/electricity/outages/report",
+    "GET /utility/payment/methods",
+    "POST /utility/payment/pay",
+    "POST /utility/payment/retry",
+    "GET /utility/payment/history",
+    "GET /utility/support/tickets",
+    "POST /utility/support/chat"
+  ]
 }

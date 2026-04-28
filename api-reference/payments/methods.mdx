@@ -1,0 +1,54 @@
+---
+title: "GET /utility/payment/methods — List payment methods"
+description: "Returns all payment methods available for the authenticated account, including credit card, bank transfer, and debit card options."
+---
+
+The `/utility/payment/methods` endpoint returns the full list of accepted payment methods for the portal. Use the returned method identifiers directly in the `method` field when submitting a bill payment via `POST /utility/payment/pay`.
+
+## Request
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication. Format: `Bearer <token>`
+</ParamField>
+
+## Response
+
+<ResponseField name="methods" type="string[]" required>
+  List of accepted payment method identifiers.
+
+  Possible values:
+  - `credit_card`
+  - `bank_transfer`
+  - `debit_card`
+</ResponseField>
+
+## Error codes
+
+| Status | Description |
+|--------|-------------|
+| `401 Unauthorized` | Missing or invalid `Authorization` header. |
+| `500 Internal Server Error` | Unexpected server-side failure. |
+
+## Example
+
+<CodeGroup>
+
+```bash Request
+curl --request GET \
+  --url https://YOUR_ID.mockapi.dog/utility/payment/methods \
+  --header 'Authorization: Bearer <token>'
+```
+
+```json Response
+{
+  "methods": [
+    "credit_card",
+    "bank_transfer",
+    "debit_card"
+  ]
+}
+```
+
+</CodeGroup>

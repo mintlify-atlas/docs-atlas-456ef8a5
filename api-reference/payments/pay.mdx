@@ -1,0 +1,156 @@
+---
+title: "POST /utility/payment/pay — Submit a bill payment"
+description: "Submits a payment for a specific bill. Supports credit card, bank transfer, and debit card. Also covers the retry endpoint for failed transactions."
+---
+
+The `/utility/payment/pay` endpoint initiates a payment against a specific bill for a given account. On success, the server returns a payment result including the assigned transaction ID and status. If a payment fails, you can retry it using the `/utility/payment/retry` endpoint with the original transaction ID.
+
+## Submit a payment
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication. Format: `Bearer <token>`
+</ParamField>
+
+### Body
+
+<ParamField body="accountId" type="string" required>
+  The account identifier associated with the bill. Example: `ELEC-100234`
+</ParamField>
+
+<ParamField body="billId" type="string" required>
+  The unique identifier for the bill being paid. Example: `BILL-2025-11`
+</ParamField>
+
+<ParamField body="amount" type="number" required>
+  Payment amount in USD. Must match or be less than the outstanding bill balance. Example: `126.45`
+</ParamField>
+
+<ParamField body="method" type="string" required>
+  Payment method to use. Accepted values: `credit_card`, `bank_transfer`, `debit_card`. Retrieve the full list from `GET /utility/payment/methods`.
+</ParamField>
+
+### Response
+
+<ResponseField name="transactionId" type="string" required>
+  Unique identifier assigned to this transaction. Example: `TXN-839182`
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  Payment outcome. One of `success`, `pending`, or `failed`.
+</ResponseField>
+
+<ResponseField name="amount" type="number" required>
+  Amount charged, in USD.
+</ResponseField>
+
+<ResponseField name="method" type="string" required>
+  Payment method used.
+</ResponseField>
+
+<ResponseField name="date" type="string" required>
+  ISO 8601 timestamp of when the transaction was recorded.
+</ResponseField>
+
+---
+
+## Retry a failed payment
+
+Use this endpoint to resubmit a previously failed transaction without re-entering payment details.
+
+**`POST /utility/payment/retry`**
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication. Format: `Bearer <token>`
+</ParamField>
+
+### Body
+
+<ParamField body="transactionId" type="string" required>
+  The transaction ID of the failed payment to retry. Example: `TXN-839182`
+</ParamField>
+
+### Response
+
+Returns the same structure as `POST /utility/payment/pay`.
+
+---
+
+## Error simulation
+
+Append a query parameter to test error scenarios in your integration.
+
+| Query parameter | Behavior |
+|----------------|----------|
+| `?error=timeout` | Simulates a network timeout. The request hangs and does not return a response. |
+| `?error=402` | Simulates a payment declined response (HTTP 402). |
+
+<Warning>
+  When `?error=402` is returned, the server responds with HTTP 402 Payment Required, indicating the payment was declined by the processor. Your integration must handle this status explicitly — do not treat a 402 as a generic error. Display a clear message to the user and offer the option to retry with a different payment method.
+</Warning>
+
+## Error codes
+
+| Status | Description |
+|--------|-------------|
+| `400 Bad Request` | Missing or invalid request body fields. |
+| `401 Unauthorized` | Missing or invalid `Authorization` header. |
+| `402 Payment Required` | Payment was declined. Returned when `?error=402` is used or the processor rejects the charge. |
+| `404 Not Found` | The specified `accountId` or `billId` does not exist. |
+| `408 Request Timeout` | The request timed out. Returned when `?error=timeout` is used. |
+| `500 Internal Server Error` | Unexpected server-side failure. |
+
+## Examples
+
+<CodeGroup>
+
+```bash Submit payment
+curl --request POST \
+  --url https://YOUR_ID.mockapi.dog/utility/payment/pay \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "accountId": "ELEC-100234",
+    "billId": "BILL-2025-11",
+    "amount": 126.45,
+    "method": "credit_card"
+  }'
+```
+
+```bash Retry failed payment
+curl --request POST \
+  --url https://YOUR_ID.mockapi.dog/utility/payment/retry \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "transactionId": "TXN-839182"
+  }'
+```
+
+```bash Simulate payment declined
+curl --request POST \
+  --url 'https://YOUR_ID.mockapi.dog/utility/payment/pay?error=402' \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "accountId": "ELEC-100234",
+    "billId": "BILL-2025-11",
+    "amount": 126.45,
+    "method": "credit_card"
+  }'
+```
+
+</CodeGroup>
+
+```json Success response
+{
+  "transactionId": "TXN-839182",
+  "status": "success",
+  "amount": 126.45,
+  "method": "credit_card",
+  "date": "2025-11-15T00:00:00.000Z"
+}
+```

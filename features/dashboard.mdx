@@ -1,0 +1,70 @@
+---
+title: "Account dashboard: balance, details, and service address"
+description: "View your current balance, due date, account details, and service addresses at a glance. Pay your bill directly from the dashboard."
+---
+
+The dashboard is your home base in Smart CX. It loads your account information automatically on first visit and gives you an at-a-glance summary of your electricity account.
+
+## What you see on the dashboard
+
+The dashboard is organized into four main areas: a balance summary at the top, a **Pay Bill** quick action, an **Account Details** card, and a **Service Address** card.
+
+### Balance summary
+
+Your current balance is displayed prominently at the top of the page with the currency symbol (e.g., `$42.75`). The due date appears directly below it so you always know when your next payment is expected.
+
+### Pay Bill
+
+The **Pay Bill** button appears next to the balance summary. Clicking it takes you directly to the payment page where you can complete a payment using a saved method.
+
+<Tip>
+  If your balance shows `$0.00`, there is nothing due. The **Pay Bill** button is still accessible if you want to make an advance payment.
+</Tip>
+
+## Account details card
+
+The **Account Details** card shows the identifying information for your electricity account.
+
+| Field | Description |
+|-------|-------------|
+| **Account ID** | Your unique account identifier (e.g., `ELEC-100234`) |
+| **Plan** | Your current rate plan (e.g., `Standard Residential`) |
+| **Status** | Whether your account is `active`, `suspended`, or another status |
+| **Meter number** | The meter ID associated with your account |
+
+## Service address card
+
+The **Service Address** card shows the physical address where electricity service is delivered.
+
+| Field | Description |
+|-------|-------------|
+| **Label** | A friendly name for the address (e.g., `Home`, `Office`) |
+| **Street** | Street number and name |
+| **City** | City |
+| **State** | State abbreviation |
+| **ZIP** | ZIP code |
+
+<Tip>
+  If your account has multiple service addresses, a dropdown selector appears at the top of the **Service Address** card. Use it to switch between addresses and view each location's details.
+</Tip>
+
+## How account data loads
+
+When you navigate to the dashboard, Smart CX automatically fetches your account data from `GET /utility/electricity/account`. No manual refresh is needed — the page populates as soon as your session is verified.
+
+If your profile is linked to multiple electricity accounts, an **Account** selector appears in the header bar at the top of every page. Use it to switch between accounts from anywhere in the portal — the dashboard and all other pages update to reflect the selected account.
+
+<Note>
+  Account data is fetched once on first load. If you need to see the latest information after making changes, refresh the page.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Pay a bill" icon="credit-card" href="/features/payments">
+    Complete a payment from the dashboard or the payments page
+  </Card>
+  <Card title="Manage your profile" icon="user" href="/features/profile">
+    Update personal information and manage service addresses
+  </Card>
+</CardGroup>

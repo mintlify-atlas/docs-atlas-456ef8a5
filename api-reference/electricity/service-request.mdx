@@ -1,0 +1,70 @@
+---
+title: "POST /utility/electricity/service-request"
+description: "Submit a general electricity service request for the authenticated account. Returns a ticket ID that can be used to track the request status."
+---
+
+Use this endpoint to open a service request for any electricity-related issue that does not fall under outage reporting or meter readings — for example, billing disputes, equipment inspections, or connection problems. The portal's Services component sends a plain-text `description` field. A ticket ID is returned immediately upon successful submission.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for the authenticated session. Format: `Bearer <token>`
+</ParamField>
+
+**Method:** `POST`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/service-request`
+
+**Content-Type:** `application/json`
+
+### Body parameters
+
+<ParamField body="description" type="string" required>
+  Free-text description of the service issue or request.
+
+  Example: `"My meter display is flickering and I suspect a fault."`
+</ParamField>
+
+## Response
+
+<ResponseField name="ticketId" type="string" required>
+  Unique identifier for the newly created service ticket. Format: `TKT-XXXXX`
+
+  Example: `"TKT-48291"`
+</ResponseField>
+
+<Warning>
+  Save the returned `ticketId`. It is the only reference you receive at submission time. There is no separate endpoint to look up tickets by description.
+</Warning>
+
+## Error codes
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Missing or empty `description` field in the request body. |
+| `401` | Missing or invalid `Authorization` header. |
+| `403` | Token does not have permission to submit service requests for this account. |
+| `404` | No electricity account found for this customer. |
+| `500` | Internal server error. |
+
+## Example
+
+```bash
+curl --request POST \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/service-request" \
+  --header "Authorization: Bearer <token>" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "description": "My meter display is flickering and I suspect a fault."
+  }'
+```
+
+<ResponseExample>
+
+```json 200
+{
+  "ticketId": "TKT-48291"
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,74 @@
+---
+title: "Make a payment securely through the payment gateway"
+description: "Pay an outstanding electricity bill through the secure iframe payment gateway, choose your payment method, and track the result — all without leaving the portal."
+---
+
+The **Payment** page lets you settle an outstanding bill through a secure, isolated payment gateway. The gateway runs inside an iframe so your payment details are handled entirely by the payment service and never pass through the portal itself.
+
+## Payment flow
+
+<Steps>
+  <Step title="Navigate to the payment page">
+    From the **Bills** page, click **Pay a Bill**. You can also navigate directly to `/payment` from the main menu.
+
+    The portal checks whether the payment service is reachable before loading the form.
+  </Step>
+
+  <Step title="Enter your payment details">
+    If the payment service is online, the payment form loads inside a secure iframe. The portal passes the following context to the form automatically — you do not need to enter these manually:
+
+    - Your **account ID**
+    - Your **current balance**
+    - Your **currency**
+    - Your **service address**
+    - The **payment methods** available on your account
+
+    Select a payment method, enter the required details, and confirm the payment.
+  </Step>
+
+  <Step title="Confirm the result">
+    After you submit the form, one of two things happens:
+
+    - **Payment successful** — the portal records the transaction against your account and your balance updates immediately. You are returned to the previous page.
+    - **Payment cancelled** — if you click cancel inside the payment form, the portal discards the session and returns you to the previous page with no changes made.
+  </Step>
+</Steps>
+
+## Supported payment methods
+
+The portal retrieves available payment methods from `GET /utility/payment/methods`. The methods available to you depend on your account configuration. The following method is supported:
+
+| Method | Key |
+|---|---|
+| Credit card | `credit_card` |
+
+<Note>
+  Your account may be configured with additional payment methods. The list displayed in the payment form reflects exactly what your utility provider has enabled for your account.
+</Note>
+
+## When the payment service is unavailable
+
+The portal checks connectivity to the payment service before rendering the iframe. If the service cannot be reached, you will see a **Payment System Unavailable** message instead of the payment form.
+
+From that screen you have two options:
+
+- **Retry** — attempts to reconnect to the payment service and reload the form
+- **Return** — takes you back to the previous page without making a payment
+
+<Warning>
+  If the payment service is unavailable, no payment can be processed. Try again in a few minutes or contact your utility provider if the issue persists.
+</Warning>
+
+## Error scenarios
+
+Errors can occur after the payment form is submitted. The following outcomes are possible:
+
+| Error | Cause | What to do |
+|---|---|---|
+| Timeout | The payment service did not respond in time | Retry the payment; check your transaction history before retrying to avoid a duplicate charge |
+| Payment declined (402) | The payment was declined by your card issuer | Verify your card details or try a different payment method |
+| Server error (500) | An unexpected error occurred on the payment service | Wait a moment and retry; contact support if the error continues |
+
+<Tip>
+  Before retrying after a timeout, check your **Payment History** on the [Bills page](/features/bills) to confirm whether the original payment was recorded. This avoids paying twice for the same bill.
+</Tip>

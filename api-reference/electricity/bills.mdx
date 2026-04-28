@@ -1,0 +1,110 @@
+---
+title: "GET /utility/electricity/bills"
+description: "Retrieve a list of electricity bills for the authenticated account, including billing period, amount, payment status, and due date for each bill."
+---
+
+The bills endpoint returns the full billing history for the authenticated electricity account. Each record in the response identifies a billing period and whether it has been paid. Use the `?error=500` query parameter in test environments to trigger a simulated server error and verify your error-handling logic.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for the authenticated session. Format: `Bearer <token>`
+</ParamField>
+
+**Method:** `GET`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/bills`
+
+### Query parameters
+
+<ParamField query="error" type="number">
+  Error simulation flag. Pass `500` to force a server error response. Intended for testing purposes only.
+
+  Example: `?error=500`
+</ParamField>
+
+<Note>
+  The `?error=500` parameter is a test hook for simulating failure scenarios. Do not use it in production.
+</Note>
+
+## Response
+
+<ResponseField name="bills" type="object[]" required>
+  Array of billing records. Returns an empty array when no bills exist.
+
+  <Expandable title="bill object properties">
+    <ResponseField name="billId" type="string" required>
+      Unique identifier for the bill. Example: `"BILL-2025-11"`
+    </ResponseField>
+    <ResponseField name="period" type="string" required>
+      Human-readable billing period. Example: `"Nov 2025"`
+    </ResponseField>
+    <ResponseField name="amount" type="number" required>
+      Total amount billed for the period in USD. Example: `126.45`
+    </ResponseField>
+    <ResponseField name="status" type="string" required>
+      Payment status. Possible values: `"paid"` or `"unpaid"`
+    </ResponseField>
+    <ResponseField name="dueDate" type="string" required>
+      Payment due date in ISO 8601 format. Example: `"2025-12-15T00:00:00.000Z"`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error codes
+
+| Status | Meaning |
+|--------|---------|
+| `401` | Missing or invalid `Authorization` header. |
+| `403` | Token does not have permission to access bills for this account. |
+| `404` | No electricity account found for this customer. |
+| `500` | Internal server error. Triggered in test environments with `?error=500`. |
+
+## Examples
+
+<CodeGroup>
+
+```bash Fetch bills
+curl --request GET \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/bills" \
+  --header "Authorization: Bearer <token>"
+```
+
+```bash Simulate server error
+curl --request GET \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/bills?error=500" \
+  --header "Authorization: Bearer <token>"
+```
+
+</CodeGroup>
+
+<ResponseExample>
+
+```json 200
+{
+  "bills": [
+    {
+      "billId": "BILL-2025-11",
+      "period": "Nov 2025",
+      "amount": 126.45,
+      "status": "unpaid",
+      "dueDate": "2025-12-15T00:00:00.000Z"
+    },
+    {
+      "billId": "BILL-2025-10",
+      "period": "Oct 2025",
+      "amount": 114.20,
+      "status": "paid",
+      "dueDate": "2025-11-15T00:00:00.000Z"
+    }
+  ]
+}
+```
+
+```json 500
+{
+  "error": "Internal Server Error"
+}
+```
+
+</ResponseExample>

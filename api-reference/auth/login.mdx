@@ -1,0 +1,89 @@
+---
+title: "POST /auth/login — Authenticate a user"
+description: "Validates user credentials and returns a JWT access token, refresh token, and user profile for authenticating subsequent requests."
+---
+
+Submit a username and password to authenticate a user. On success, the response includes a short-lived JWT access token, a refresh token for obtaining new access tokens, and the user's profile object. Store the `token` value and attach it as a `Bearer` token on all subsequent authenticated requests.
+
+## Request body
+
+<ParamField body="username" type="string" required>
+  The user's email address.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  The user's password.
+</ParamField>
+
+## Response fields
+
+<ResponseField name="user" type="object">
+  User profile information.
+
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the user.
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      The user's email address.
+    </ResponseField>
+    <ResponseField name="firstName" type="string">
+      The user's first name.
+    </ResponseField>
+    <ResponseField name="lastName" type="string">
+      The user's last name.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="token" type="string">
+  JWT access token for authenticating requests. Include this value in the `Authorization` header as `Bearer <token>`.
+</ResponseField>
+
+<ResponseField name="refreshToken" type="string">
+  JWT refresh token for obtaining new access tokens when the current one expires. Store this securely; it is passed to `POST /auth/refresh`.
+</ResponseField>
+
+## Error responses
+
+| Status | Description |
+|--------|-------------|
+| `401`  | Invalid credentials. The username or password is incorrect. |
+| `500`  | Internal server error. |
+
+<Note>
+  Send the `token` value in the `Authorization` header on all subsequent requests:
+
+  ```
+  Authorization: Bearer <token>
+  ```
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```bash Request
+curl --request POST \
+  --url https://YOUR_ID.mockapi.dog/auth/login \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "username": "john.doe@test.com",
+    "password": "Password@123"
+  }'
+```
+
+```json Response
+{
+  "user": {
+    "id": "usr_01",
+    "email": "john.doe@test.com",
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+</CodeGroup>

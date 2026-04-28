@@ -1,0 +1,97 @@
+---
+title: "POST /utility/support/chat — Send a support message"
+description: "Sends a message to the Smart CX virtual assistant and returns a reply. The full conversation history must be included with each request to maintain context."
+---
+
+The `/utility/support/chat` endpoint powers the Smart CX Virtual Assistant chat experience. Each request sends the user's latest message along with the complete conversation history up to that point. The server uses the full history to generate a contextually relevant reply.
+
+<Note>
+  The portal sends the entire conversation history with every message. This is by design — the endpoint is stateless and does not persist session state between calls. Your client must maintain the history array and append each new exchange before sending the next request.
+</Note>
+
+## Request
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication. Format: `Bearer <token>`
+</ParamField>
+
+### Body
+
+<ParamField body="accountId" type="string" required>
+  The account identifier for the customer sending the message. Example: `ELEC-100234`
+</ParamField>
+
+<ParamField body="message" type="string" required>
+  The user's current message. Example: `When is my bill due?`
+</ParamField>
+
+<ParamField body="history" type="object[]" required>
+  Full conversation history in chronological order, not including the current `message`. Each item is a turn in the conversation.
+
+  <Expandable title="history item properties">
+    <ResponseField name="role" type="string" required>
+      Who sent this message. One of:
+      - `bot` — A reply from the virtual assistant.
+      - `user` — A message from the account holder.
+    </ResponseField>
+
+    <ResponseField name="content" type="string" required>
+      The text content of the message.
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="reply" type="string" required>
+  The virtual assistant's response to the user's message.
+</ResponseField>
+
+## Error codes
+
+| Status | Description |
+|--------|-------------|
+| `400 Bad Request` | Missing or invalid request body fields. |
+| `401 Unauthorized` | Missing or invalid `Authorization` header. |
+| `500 Internal Server Error` | Unexpected server-side failure. |
+
+## Example
+
+The example below shows a multi-turn conversation. The `history` array contains the prior exchange, and `message` carries the user's latest question.
+
+<CodeGroup>
+
+```bash Request
+curl --request POST \
+  --url https://YOUR_ID.mockapi.dog/utility/support/chat \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "accountId": "ELEC-100234",
+    "message": "When is my bill due?",
+    "history": [
+      {
+        "role": "bot",
+        "content": "Hi there! I'\''m your Smart CX Virtual Assistant. How can I help you today?"
+      },
+      {
+        "role": "user",
+        "content": "I have a question about my account."
+      },
+      {
+        "role": "bot",
+        "content": "Of course! What would you like to know about your account?"
+      }
+    ]
+  }'
+```
+
+```json Response
+{
+  "reply": "Your current bill for account ELEC-100234 is due on December 1, 2025. You can pay it now from the Payments section. Is there anything else I can help you with?"
+}
+```
+
+</CodeGroup>

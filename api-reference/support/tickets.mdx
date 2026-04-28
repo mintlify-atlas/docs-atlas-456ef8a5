@@ -1,0 +1,85 @@
+---
+title: "GET /utility/support/tickets — List support tickets"
+description: "Returns all support tickets associated with the authenticated account, including subject, status, and submission date for each ticket."
+---
+
+The `/utility/support/tickets` endpoint retrieves a list of all support tickets filed for the current account. Use this endpoint to display open issues, track in-progress cases, or review closed tickets in the portal's support history view.
+
+## Request
+
+### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for authentication. Format: `Bearer <token>`
+</ParamField>
+
+## Response
+
+<ResponseField name="tickets" type="object[]" required>
+  Array of support ticket records for the account.
+
+  <Expandable title="ticket object properties">
+    <ResponseField name="id" type="string" required>
+      Unique identifier for the ticket. Example: `TKT-8902`
+    </ResponseField>
+
+    <ResponseField name="subject" type="string" required>
+      Short description of the issue reported. Example: `Billing Dispute`
+    </ResponseField>
+
+    <ResponseField name="status" type="string" required>
+      Current state of the ticket. One of:
+      - `Open` — Ticket has been submitted and is awaiting assignment.
+      - `In Progress` — A support agent is actively working on the ticket.
+      - `Closed` — The ticket has been resolved and closed.
+    </ResponseField>
+
+    <ResponseField name="date" type="string" required>
+      ISO 8601 timestamp of when the ticket was submitted.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error codes
+
+| Status | Description |
+|--------|-------------|
+| `401 Unauthorized` | Missing or invalid `Authorization` header. |
+| `500 Internal Server Error` | Unexpected server-side failure. |
+
+## Example
+
+<CodeGroup>
+
+```bash Request
+curl --request GET \
+  --url https://YOUR_ID.mockapi.dog/utility/support/tickets \
+  --header 'Authorization: Bearer <token>'
+```
+
+```json Response
+{
+  "tickets": [
+    {
+      "id": "TKT-8902",
+      "subject": "Billing Dispute",
+      "status": "In Progress",
+      "date": "2025-11-10T09:30:00.000Z"
+    },
+    {
+      "id": "TKT-8744",
+      "subject": "Unable to update payment method",
+      "status": "Closed",
+      "date": "2025-10-22T14:15:00.000Z"
+    },
+    {
+      "id": "TKT-9101",
+      "subject": "Meter reading discrepancy",
+      "status": "Open",
+      "date": "2025-11-18T08:00:00.000Z"
+    }
+  ]
+}
+```
+
+</CodeGroup>

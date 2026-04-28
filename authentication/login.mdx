@@ -1,0 +1,110 @@
+---
+title: 'Log in and obtain an access token'
+description: 'POST /auth/login authenticates a user with email and password, returning a JWT access token, refresh token, and user profile object.'
+---
+
+The `POST /auth/login` endpoint authenticates a user and returns a JWT access token, a refresh token, and the authenticated user object. The portal's login page handles this flow through an embedded login service — but you can also call the endpoint directly.
+
+## How the portal login works
+
+The login page embeds an iframe pointing to the external login service (`VITE_LOGIN_SERVICE_URL`). When authentication succeeds, the service sends a `postMessage` event to the portal:
+
+```javascript
+// Message received by the portal on successful login
+{
+  type: 'LOGIN_SUCCESS',
+  payload: {
+    user: { ... },
+    token: '<access_token>',
+    refreshToken: '<refresh_token>'
+  }
+}
+```
+
+The portal stores these values in the `auth` Redux slice via the `setCredentials` action.
+
+## Endpoint
+
+```
+POST /auth/login
+```
+
+### Request body
+
+<ParamField body="username" type="string" required>
+  The user's email address.
+</ParamField>
+
+<ParamField body="password" type="string" required>
+  The user's password.
+</ParamField>
+
+### Response fields
+
+<ResponseField name="user" type="object" required>
+  The authenticated user object.
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Unique identifier for the user.
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      The user's email address.
+    </ResponseField>
+    <ResponseField name="firstName" type="string">
+      The user's first name.
+    </ResponseField>
+    <ResponseField name="lastName" type="string">
+      The user's last name.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="token" type="string" required>
+  A short-lived JWT access token. Include this in the `Authorization: Bearer` header for all subsequent API requests.
+</ResponseField>
+
+<ResponseField name="refreshToken" type="string" required>
+  A long-lived token used to obtain a new access token when the current one expires. See [Token refresh](/authentication/token-refresh).
+</ResponseField>
+
+## Example
+
+```bash
+curl --request POST \
+  --url https://api.smartcx.example.com/auth/login \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "username": "john.doe@test.com",
+    "password": "Password@123"
+  }'
+```
+
+Example response:
+
+```json
+{
+  "user": {
+    "id": "usr_abc123",
+    "email": "john.doe@test.com",
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "token": "<access_token>",
+  "refreshToken": "<refresh_token>"
+}
+```
+
+## Error scenarios
+
+| Status | Cause                                                          | Action                                  |
+| ------ | -------------------------------------------------------------- | --------------------------------------- |
+| `401`  | Invalid username or password.                                  | Verify credentials and try again.       |
+| `503`  | The login service is temporarily unavailable.                  | Retry after a short delay.              |
+
+<Warning>
+  Never log or expose the `token` or `refreshToken` values. Treat them as secrets with the same care as passwords.
+</Warning>
+
+<Note>
+  After a successful login, the portal automatically attaches the access token to all subsequent API requests. You do not need to manage the `Authorization` header manually within the portal.
+</Note>

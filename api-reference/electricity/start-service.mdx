@@ -1,0 +1,194 @@
+---
+title: "POST /utility/electricity/start-service"
+description: "Initiate electricity service at a new address. Authenticated requests use account data on file; unauthenticated requests must include personal identity fields."
+---
+
+Use this endpoint to initiate electricity service at a new address. The request can be submitted by an authenticated customer — in which case personal identity fields (`firstName`, `lastName`, `email`, `phone`, `ssn`) are pulled from the existing account — or by an unauthenticated user who must supply those fields explicitly in the body. A service ticket ID is returned upon a successful request.
+
+<Warning>
+  The `ssn` field is sensitive. Always transmit requests containing `ssn` over HTTPS. Never log or store the raw SSN value on the client side.
+</Warning>
+
+## Request
+
+<ParamField header="Authorization" type="string">
+  Bearer token for an authenticated session. Format: `Bearer <token>`
+
+  Omit this header for unauthenticated requests. When omitted, the personal identity fields become required.
+</ParamField>
+
+**Method:** `POST`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/start-service`
+
+**Content-Type:** `application/json`
+
+### Body parameters
+
+#### Service address
+
+<ParamField body="street" type="string" required>
+  Street address for the new service location.
+
+  Example: `"123 Main St"`
+</ParamField>
+
+<ParamField body="city" type="string" required>
+  City for the new service location.
+
+  Example: `"Austin"`
+</ParamField>
+
+<ParamField body="state" type="string" required>
+  Two-letter state abbreviation.
+
+  Example: `"TX"`
+</ParamField>
+
+<ParamField body="zip" type="string" required>
+  ZIP code for the new service location.
+
+  Example: `"78701"`
+</ParamField>
+
+#### Service details
+
+<ParamField body="startDate" type="string" required>
+  Requested service start date in `YYYY-MM-DD` format.
+
+  Example: `"2025-02-01"`
+</ParamField>
+
+<ParamField body="planType" type="string" required>
+  Rate plan to enroll in. Accepted values: `"standard"`, `"green"`, `"time_of_use"`
+</ParamField>
+
+<ParamField body="propertyType" type="string" required>
+  Type of property being connected. Accepted values: `"Single Family Home"`, `"Apartment"`, `"Gated Community"`
+</ParamField>
+
+<ParamField body="isSomeonePresent" type="string" required>
+  Whether someone will be present at the property when the technician arrives. Accepted values: `"yes"`, `"no"`
+</ParamField>
+
+<ParamField body="accessInstructions" type="string">
+  Instructions for the technician to access the property (e.g., gate codes, key location).
+
+  Example: `"Gate code 1234"`
+</ParamField>
+
+<ParamField body="secondaryContact" type="string">
+  Alternate phone number the technician can call on the day of connection.
+
+  Example: `"555-0100"`
+</ParamField>
+
+#### Identity fields — unauthenticated requests only
+
+<Note>
+  The following fields are **required** when no `Authorization` header is provided. They are ignored if a valid bearer token is present, as the account information is retrieved from the authenticated session.
+</Note>
+
+<ParamField body="firstName" type="string">
+  Customer's first name. Required for unauthenticated requests.
+
+  Example: `"Jane"`
+</ParamField>
+
+<ParamField body="lastName" type="string">
+  Customer's last name. Required for unauthenticated requests.
+
+  Example: `"Doe"`
+</ParamField>
+
+<ParamField body="email" type="string">
+  Customer's email address. Required for unauthenticated requests.
+
+  Example: `"jane@example.com"`
+</ParamField>
+
+<ParamField body="phone" type="string">
+  Customer's phone number. Required for unauthenticated requests.
+
+  Example: `"5550199000"`
+</ParamField>
+
+<ParamField body="ssn" type="string">
+  Customer's Social Security Number (digits only). Required for unauthenticated requests for identity verification.
+
+  Example: `"123456789"`
+</ParamField>
+
+## Response
+
+<ResponseField name="ticketId" type="string" required>
+  Unique service request identifier. Format: `SVC-XXXXX`
+
+  Example: `"SVC-78432"`
+</ResponseField>
+
+## Error codes
+
+| Status | Meaning |
+|--------|---------|
+| `400` | One or more required fields are missing or contain invalid values. |
+| `401` | An unauthenticated request is missing required identity fields. |
+| `409` | Active electricity service already exists at the requested address. |
+| `422` | `startDate` is in the past or `planType`/`propertyType` value is unrecognized. |
+| `500` | Internal server error. |
+
+## Examples
+
+<CodeGroup>
+
+```bash Authenticated request
+curl --request POST \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/start-service" \
+  --header "Authorization: Bearer <token>" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "street": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "startDate": "2025-02-01",
+    "planType": "standard",
+    "propertyType": "Single Family Home",
+    "isSomeonePresent": "yes",
+    "accessInstructions": "Gate code 1234",
+    "secondaryContact": "555-0100"
+  }'
+```
+
+```bash Unauthenticated request
+curl --request POST \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/start-service" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "street": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701",
+    "startDate": "2025-02-01",
+    "planType": "green",
+    "propertyType": "Apartment",
+    "isSomeonePresent": "no",
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane@example.com",
+    "phone": "5550199000",
+    "ssn": "123456789"
+  }'
+```
+
+</CodeGroup>
+
+<ResponseExample>
+
+```json 200
+{
+  "ticketId": "SVC-78432"
+}
+```
+
+</ResponseExample>

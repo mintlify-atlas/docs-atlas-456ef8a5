@@ -1,0 +1,144 @@
+---
+title: "GET /utility/electricity/account"
+description: "Retrieve the authenticated customer's electricity account details, including balance, plan, meter number, service address, and linked accounts."
+---
+
+The account endpoint returns a snapshot of the customer's electricity account. Use it to display current balance and due date, look up plan information, resolve the active meter number, or fetch the service address for downstream requests.
+
+## Request
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token for the authenticated session. Format: `Bearer <token>`
+</ParamField>
+
+**Method:** `GET`
+
+**Path:** `https://YOUR_ID.mockapi.dog/utility/electricity/account`
+
+No query parameters or request body are required.
+
+## Response
+
+<ResponseField name="accountId" type="string" required>
+  Primary account identifier. Example: `"ELEC-100234"`
+</ResponseField>
+
+<ResponseField name="availableAccounts" type="string[]" required>
+  List of all electricity account IDs associated with this customer.
+</ResponseField>
+
+<ResponseField name="plan" type="string" required>
+  Current rate plan name. Example: `"Standard Residential"`
+</ResponseField>
+
+<ResponseField name="status" type="string" required>
+  Account status. Possible values: `"active"`, `"inactive"`, `"suspended"`
+</ResponseField>
+
+<ResponseField name="meterNumber" type="string" required>
+  Meter identifier assigned to the service address. Example: `"MTR-556677"`
+</ResponseField>
+
+<ResponseField name="currentBalance" type="number" required>
+  Outstanding balance in the account's currency. Example: `126.45`
+</ResponseField>
+
+<ResponseField name="currency" type="string" required>
+  ISO 4217 currency code. Example: `"USD"`
+</ResponseField>
+
+<ResponseField name="dueDate" type="string" required>
+  Payment due date in ISO 8601 format. Example: `"2025-12-15T00:00:00.000Z"`
+</ResponseField>
+
+<ResponseField name="serviceAddress" type="object | object[]">
+  Service address or array of addresses. May also appear as `serviceAddresses` (array). When a single object is returned it has the following shape:
+
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      Internal address identifier.
+    </ResponseField>
+    <ResponseField name="label" type="string">
+      Human-readable label (e.g., `"Primary Home"`).
+    </ResponseField>
+    <ResponseField name="street" type="string">
+      Street address line.
+    </ResponseField>
+    <ResponseField name="city" type="string">
+      City name.
+    </ResponseField>
+    <ResponseField name="state" type="string">
+      Two-letter state abbreviation.
+    </ResponseField>
+    <ResponseField name="zip" type="string">
+      ZIP / postal code.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="customer" type="object" required>
+  Contact information for the account holder.
+
+  <Expandable title="properties">
+    <ResponseField name="firstName" type="string">
+      Customer's first name.
+    </ResponseField>
+    <ResponseField name="lastName" type="string">
+      Customer's last name.
+    </ResponseField>
+    <ResponseField name="email" type="string">
+      Customer's email address.
+    </ResponseField>
+    <ResponseField name="phone" type="string">
+      Customer's phone number.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error codes
+
+| Status | Meaning |
+|--------|---------|
+| `401` | Missing or invalid `Authorization` header. |
+| `403` | Token does not have permission to access this account. |
+| `404` | No electricity account found for this customer. |
+| `500` | Internal server error. |
+
+## Example
+
+```bash
+curl --request GET \
+  --url "https://YOUR_ID.mockapi.dog/utility/electricity/account" \
+  --header "Authorization: Bearer <token>"
+```
+
+<ResponseExample>
+
+```json 200
+{
+  "accountId": "ELEC-100234",
+  "availableAccounts": ["ELEC-100234", "ELEC-100235"],
+  "plan": "Standard Residential",
+  "status": "active",
+  "meterNumber": "MTR-556677",
+  "currentBalance": 126.45,
+  "currency": "USD",
+  "dueDate": "2025-12-15T00:00:00.000Z",
+  "serviceAddress": {
+    "id": "addr-001",
+    "label": "Primary Home",
+    "street": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zip": "78701"
+  },
+  "customer": {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane@example.com",
+    "phone": "5550199000"
+  }
+}
+```
+
+</ResponseExample>

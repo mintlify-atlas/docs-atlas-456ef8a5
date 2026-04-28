@@ -1,0 +1,72 @@
+---
+title: "Smart CX: Utility Customer Experience Portal"
+description: "Smart CX is a full-featured utility customer portal for managing electricity accounts, bills, payments, outages, and support — all in one place."
+---
+
+Smart CX is a web-based customer experience portal designed for utility companies and their customers. It provides a unified interface where residential and commercial customers can view their electricity account details, pay bills, monitor outage status, submit meter readings, and get help through an AI-powered support assistant.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Set up your account and complete your first action in minutes
+  </Card>
+  <Card title="Authentication" icon="lock" href="/authentication/overview">
+    Learn how to log in and keep your session secure
+  </Card>
+  <Card title="Features" icon="grid-2" href="/features/dashboard">
+    Explore the dashboard, billing, payments, outages, and more
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/auth/login">
+    Full reference for all REST API endpoints
+  </Card>
+</CardGroup>
+
+## What you can do with Smart CX
+
+Smart CX covers the full lifecycle of utility account management:
+
+<CardGroup cols={2}>
+  <Card title="View your account" icon="gauge" href="/features/dashboard">
+    See your current balance, due date, meter number, plan, and service addresses at a glance
+  </Card>
+  <Card title="Pay bills" icon="credit-card" href="/features/payments">
+    Pay outstanding bills using saved payment methods through a secure payment gateway
+  </Card>
+  <Card title="Billing history" icon="file-invoice" href="/features/bills">
+    Browse, filter, and export your bill and payment history to CSV
+  </Card>
+  <Card title="Outage center" icon="bolt" href="/features/outages">
+    Check real-time outage status for your area and report power loss
+  </Card>
+  <Card title="Service requests" icon="wrench" href="/features/services">
+    Submit meter readings and open service tickets directly from your account
+  </Card>
+  <Card title="Start new service" icon="house-circle-check" href="/features/start-service">
+    Activate electricity at a new address with a guided multi-step wizard
+  </Card>
+  <Card title="Support chat" icon="comments" href="/features/support-chat">
+    Get instant answers from the Smart CX virtual assistant or track open tickets
+  </Card>
+  <Card title="Profile management" icon="user" href="/features/profile">
+    Manage your personal information and service addresses
+  </Card>
+</CardGroup>
+
+## How it works
+
+Smart CX is a React single-page application that communicates with a backend mock API. Authentication uses JWT access and refresh tokens — your session is automatically maintained so you stay logged in without interruption.
+
+<Steps>
+  <Step title="Log in">
+    Navigate to your Smart CX portal URL. You'll be directed to the secure login screen. Enter your credentials to receive an access token and refresh token.
+  </Step>
+  <Step title="View your dashboard">
+    After login, the dashboard shows your current balance, due date, plan, meter number, and service address.
+  </Step>
+  <Step title="Manage your account">
+    Use the navigation menu to access bills, payments, services, outages, and support from any page.
+  </Step>
+</Steps>
+
+<Note>
+  If you need to activate service at a new property, you can start the process without logging in by visiting the **Start Service** page directly.
+</Note>
